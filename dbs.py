@@ -24,7 +24,8 @@ from python_dbs import docker_funct
 # 
 
 aparser = argparse.ArgumentParser(description="Docker Build System For Package Maintainers")
-aparser.add_argument('-d', '--docker-image', action='store', required=True, help="Docker AUTHOR:TAG to use")
+aparser.add_argument('-d', '--docker-image', action='store', required=True, help=\
+"Docker image:tag to use")
 aparser.add_argument('-dbg', '--debug', action='store_true', required=False, help="Debug output")
 args = aparser.parse_args()
 
@@ -49,19 +50,29 @@ stdoutLogger=logging.StreamHandler()
 if args.debug:
 	stdoutLogger.setLevel(logging.DEBUG)
 else:
-	stdoutLogger.setLevel(logging.WARNING)
+	stdoutLogger.setLevel(logging.INFO)
 stdoutLogger.setFormatter(logging.Formatter(log_formatting))
 logging.getLogger().addHandler(stdoutLogger)
 
 # Initial vars
-docker_author = args.docker_image.split(':')[0]
-docker_tag = args.docker_image.split(':')[1]
+try:
+	author = args.docker_image.split('/')[0]
+	image = args.docker_image.split('/')[1]
+except:
+	author = ""
+	image = args.docker_image.split(':')[0]
+tag = args.docker_image.split(':')[1]
+
+logging.debug("Author: " + author)
+logging.debug("Image: " + image)
+logging.debug("Tag: " + tag)
 
 #
 # Checks
 #
 
-local_image = docker_funct.check_for_image(docker_author, docker_tag)
+# Validate the image and attempt to pull it if a local image is not found
+validate_image = docker_funct.check_for_image(author, image, tag)
 
 # Pause for now, debugging
 sys.exit(1)
