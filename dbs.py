@@ -13,15 +13,19 @@ import os
 import pwd
 import shutil
 import subprocess
+import sys
 
 # internal modules
+# Import manually from folder for now until a proper setup.py is finished
+from python_dbs import docker_funct
 
 #
 # arguments
 # 
 
-aparser = argparse.ArgumentParser(description="Hadoop user access query tool")
-aparser.add_argument('-u', '--user', action='store', required=True, help="Specify user")
+aparser = argparse.ArgumentParser(description="Docker Build System For Package Maintainers")
+aparser.add_argument('-d', '--docker-image', action='store', required=True, help="Docker AUTHOR:TAG to use")
+aparser.add_argument('-dbg', '--debug', action='store_true', required=False, help="Debug output")
 args = aparser.parse_args()
 
 # 
@@ -38,16 +42,29 @@ divider_short = str('\n' + '-' * 25 + '\n')
 # Reuse the same log file for now (unless we should keep these rolling)
 # Log all for file log
 log_formatting = '%(asctime)s - %(levelname)s - %(message)s'
-logging.basicConfig(filename=log_filename, level=logging.INFO, filemode='w', format=log_formatting)
+logging.basicConfig(filename=log_filename, level=logging.DEBUG, filemode='w', format=log_formatting)
 # Log to file and to stdout
 # For the console logger, only show warnings, error, critical
 stdoutLogger=logging.StreamHandler()
-stdoutLogger.setLevel(logging.WARNING)
+if args.debug:
+	stdoutLogger.setLevel(logging.DEBUG)
+else:
+	stdoutLogger.setLevel(logging.WARNING)
 stdoutLogger.setFormatter(logging.Formatter(log_formatting))
 logging.getLogger().addHandler(stdoutLogger)
 
 # Initial vars
-user = args.user
+docker_author = args.docker_image.split(':')[0]
+docker_tag = args.docker_image.split(':')[1]
+
+#
+# Checks
+#
+
+local_image = docker_funct.check_for_image(docker_author, docker_tag)
+
+# Pause for now, debugging
+sys.exit(1)
 
 # Check for sudo initialization
 proc_status = subprocess.call(['sudo', '-n', 'ls'], stdout=open('/dev/null', 'w'))

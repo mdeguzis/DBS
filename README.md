@@ -7,6 +7,12 @@ This package borrows some ideas from several projects to try and bring together 
 * https://github.com/hartwork/image-bootstrap
 * https://github.com/dburm/docker-builder
 
+# Software requirements
+
+List of required Python modules:
+
+* [docker (python)](https://pypi.python.org/pypi/docker)
+
 # Goals
 
 * Use upstream official docker images to keep this lightweight
